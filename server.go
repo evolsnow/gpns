@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/anachronistic/apns"
-	pb "github.com/evolsnow/rpc/protos"
+	pb "github.com/evolsnow/gpns/protos"
 	"golang.org/x/net/context"
 	"log"
 	"sync"
