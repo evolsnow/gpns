@@ -53,12 +53,13 @@ func (s server) ApplePush(ctx context.Context, in *pb.PushRequest) (*pb.PushRepl
 
 // Test WebSocket Push
 func (s server) TestSocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
+	info := map[string]interface{}{
+		"msg":  in.Msg,
+		"type": in.MsgType,
+	}
 	for _, v := range socketMap {
 		//v.WriteMessage(websocket.TextMessage, []byte(in.Msg))
-		v.WriteJSON(map[string]interface{}{
-			"msg":  in.Msg,
-			"type": in.MsgType,
-		})
+		v.WriteJSON(info)
 	}
 	return &pb.SocketPushReply{Msg: in.Msg, MsgType: in.MsgType}, nil
 }
