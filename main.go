@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/evolsnow/httprouter"
-	pb "github.com/evolsnow/rpc/protos"
+	pb "github.com/evolsnow/gpns/protos"
 	"google.golang.org/grpc"
 	"log"
 	"net"
