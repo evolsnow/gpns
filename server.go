@@ -59,7 +59,10 @@ func (s server) TestSocketPush(ctx context.Context, in *pb.SocketPushRequest) (*
 	}
 	for _, v := range socketMap {
 		//v.WriteMessage(websocket.TextMessage, []byte(in.Msg))
-		v.WriteJSON(info)
+		err := v.WriteJSON(info)
+		if err != nil {
+			//client closed
+		}
 	}
 	return &pb.SocketPushReply{Msg: in.Msg, MsgType: in.MsgType}, nil
 }
