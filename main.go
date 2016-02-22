@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/evolsnow/httprouter"
 	pb "github.com/evolsnow/gpns/protos"
+	"github.com/evolsnow/httprouter"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -18,7 +18,9 @@ func main() {
 	// http server
 	router := httprouter.New()
 	router.GET("/websocket/:token", Socket)
-	log.Fatal(http.ListenAndServe(":10000", router))
+	go func() {
+		log.Fatal(http.ListenAndServe(":10000", router))
+	}()
 
 	// rpc server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
