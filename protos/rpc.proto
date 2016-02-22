@@ -12,6 +12,9 @@ service GPNS {
   // Apple Push
   rpc ApplePush (PushRequest) returns (PushReply) {}
 
+  // Test websocket Push
+  rpc TestSocketPush (SocketPushRequest) returns (SocketPushReply) {}
+
 }
 
 // The request message containing the user's name.
@@ -38,3 +41,21 @@ message PushReply{
   int32 count = 1;
   repeated string deviceToken = 2;
 }
+
+// Test websocket push
+enum MsgType {
+    JSON = 0;
+    RAW = 1;
+  }
+
+message SocketPushRequest{
+  string msg = 1;
+  MsgType msgType = 2;
+}
+
+message SocketPushReply{
+  string msg = 1;
+  MsgType msgType = 2;
+}
+
+message Empty {}

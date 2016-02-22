@@ -6,12 +6,13 @@ import (
 	"golang.org/x/net/context"
 	"log"
 	"sync"
+	//"github.com/gorilla/websocket"
 )
 
-// server is used to implement rpc.GreeterServer.
+// server is used to implement rpc.GPNSServer.
 type server struct{}
 
-// SayHello implements rpc.GreeterServer
+// SayHello implements rpc.GPNSServer
 func (s server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	return &pb.HelloReply{Message: "Hello " + in.Name, Age: 24}, nil
 }
@@ -48,6 +49,18 @@ func (s server) ApplePush(ctx context.Context, in *pb.PushRequest) (*pb.PushRepl
 	}
 	wg.Wait()
 	return reply, nil
+}
+
+// Test WebSocket Push
+func (s server) TestSocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
+	for _, v := range socketMap {
+		//v.WriteMessage(websocket.TextMessage, []byte(in.Msg))
+		v.WriteJSON(map[string]interface{}{
+			"msg":  in.Msg,
+			"type": in.MsgType,
+		})
+	}
+	return &pb.SocketPushReply{Msg: in.Msg, MsgType: in.MsgType}, nil
 }
 
 //// Stream Apple Push

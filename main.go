@@ -17,7 +17,8 @@ func main() {
 	flag.Parse()
 	// http server
 	router := httprouter.New()
-	router.GET("/websocket/:token", Socket)
+	router.GET("/websocket", RawSocket)
+	router.GET("/websocket/:token", AuthedSocket)
 	go func() {
 		log.Fatal(http.ListenAndServe(":10000", router))
 	}()
