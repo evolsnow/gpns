@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/anachronistic/apns"
 	pb "github.com/evolsnow/gpns/protos"
 	"github.com/evolsnow/samaritan/common/log"
 	"github.com/gorilla/websocket"
+	apns "github.com/sideshow/apns2"
+	"github.com/sideshow/apns2/certificate"
+	"github.com/sideshow/apns2/payload"
 	"golang.org/x/net/context"
 	"net/mail"
 	"net/smtp"
@@ -46,32 +48,37 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 
 // ApplePush
 func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.ApplePushReply, error) {
-	payload := apns.NewPayload()
-	payload.Alert = in.Message
-	payload.Sound = "default"
-	payload.Badge = 1
-	client := apns.NewClient("gateway.sandbox.push.apple.com:2195", "cert.pem", "key.pem")
+	cert, err := certificate.FromPemFile("dev.pem", "")
+	if err != nil {
+		log.Error(err)
+	}
+	client := apns.NewClient(cert).Development()
 
+	payload := payload.NewPayload()
+	payload.Alert(in.Message)
+	payload.Sound("default")
+	payload.Badge(1)
+	for k, v := range in.ExtraInfo {
+		payload.Custom(k, v)
+	}
 	reply := new(pb.ApplePushReply)
 	var wg sync.WaitGroup
 	wg.Add(len(in.DeviceToken))
 	for _, token := range in.DeviceToken {
-		pn := apns.NewPushNotification()
-		pn.DeviceToken = token
-		for k, v := range in.ExtraInfo {
-			pn.Set(k, v)
-		}
-		pn.AddPayload(payload)
-		go func(*apns.PushNotification) {
+		nf := new(apns.Notification)
+		nf.DeviceToken = token
+
+		nf.Payload = payload
+		go func(*apns.Notification) {
 			defer wg.Done()
-			resp := client.Send(pn)
-			if resp.Error != nil {
-				log.Println("push notification error:", resp.Error)
-				reply.DeviceToken = append(reply.DeviceToken, pn.DeviceToken)
+			resp, _ := client.Push(nf)
+			if resp.StatusCode != 200 {
+				log.Error("push notification error:", resp.Reason)
+				reply.DeviceToken = append(reply.DeviceToken, nf.DeviceToken)
 			} else {
-				log.Println("successfully push:", pn.DeviceToken)
+				log.Info("successfully push:", nf.DeviceToken)
 			}
-		}(pn)
+		}(nf)
 	}
 	wg.Wait()
 	return reply, nil
