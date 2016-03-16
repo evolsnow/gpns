@@ -11,10 +11,16 @@ It is generated from these files:
 It has these top-level messages:
 	HelloRequest
 	HelloReply
-	PushRequest
-	PushReply
+	ApplePushRequest
+	ApplePushReply
 	SocketPushRequest
 	SocketPushReply
+	MailRequest
+	MailResponse
+	ReceiveChatRequest
+	ReceiveChatReply
+	SendChatRequest
+	SendChatReply
 	Empty
 */
 package protos
@@ -36,28 +42,6 @@ var _ = math.Inf
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 const _ = proto.ProtoPackageIsVersion1
-
-// Test websocket push
-type MsgType int32
-
-const (
-	MsgType_JSON MsgType = 0
-	MsgType_RAW  MsgType = 1
-)
-
-var MsgType_name = map[int32]string{
-	0: "JSON",
-	1: "RAW",
-}
-var MsgType_value = map[string]int32{
-	"JSON": 0,
-	"RAW":  1,
-}
-
-func (x MsgType) String() string {
-	return proto.EnumName(MsgType_name, int32(x))
-}
-func (MsgType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 // The request message containing the user's name.
 type HelloRequest struct {
@@ -81,39 +65,39 @@ func (m *HelloReply) String() string            { return proto.CompactTextString
 func (*HelloReply) ProtoMessage()               {}
 func (*HelloReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-// Push request, containing push message and repeated device token
-type PushRequest struct {
+// Apple push request, containing push message and repeated device token
+type ApplePushRequest struct {
 	Message     string            `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
 	DeviceToken []string          `protobuf:"bytes,2,rep,name=deviceToken" json:"deviceToken,omitempty"`
 	ExtraInfo   map[string]string `protobuf:"bytes,3,rep,name=extraInfo" json:"extraInfo,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 }
 
-func (m *PushRequest) Reset()                    { *m = PushRequest{} }
-func (m *PushRequest) String() string            { return proto.CompactTextString(m) }
-func (*PushRequest) ProtoMessage()               {}
-func (*PushRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *ApplePushRequest) Reset()                    { *m = ApplePushRequest{} }
+func (m *ApplePushRequest) String() string            { return proto.CompactTextString(m) }
+func (*ApplePushRequest) ProtoMessage()               {}
+func (*ApplePushRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *PushRequest) GetExtraInfo() map[string]string {
+func (m *ApplePushRequest) GetExtraInfo() map[string]string {
 	if m != nil {
 		return m.ExtraInfo
 	}
 	return nil
 }
 
-// Push response, containing numbers of successful push and failed token list
-type PushReply struct {
-	Count       int32    `protobuf:"varint,1,opt,name=count" json:"count,omitempty"`
+// Apple push response, containing numbers of successful push and failed device list
+type ApplePushReply struct {
 	DeviceToken []string `protobuf:"bytes,2,rep,name=deviceToken" json:"deviceToken,omitempty"`
 }
 
-func (m *PushReply) Reset()                    { *m = PushReply{} }
-func (m *PushReply) String() string            { return proto.CompactTextString(m) }
-func (*PushReply) ProtoMessage()               {}
-func (*PushReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (m *ApplePushReply) Reset()                    { *m = ApplePushReply{} }
+func (m *ApplePushReply) String() string            { return proto.CompactTextString(m) }
+func (*ApplePushReply) ProtoMessage()               {}
+func (*ApplePushReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
+// webSocket push
 type SocketPushRequest struct {
-	Msg     string  `protobuf:"bytes,1,opt,name=msg" json:"msg,omitempty"`
-	MsgType MsgType `protobuf:"varint,2,opt,name=msgType,enum=protos.MsgType" json:"msgType,omitempty"`
+	Message   string   `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
+	UserToken []string `protobuf:"bytes,2,rep,name=userToken" json:"userToken,omitempty"`
 }
 
 func (m *SocketPushRequest) Reset()                    { *m = SocketPushRequest{} }
@@ -121,9 +105,9 @@ func (m *SocketPushRequest) String() string            { return proto.CompactTex
 func (*SocketPushRequest) ProtoMessage()               {}
 func (*SocketPushRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
+// webSocket failed user token
 type SocketPushReply struct {
-	Msg     string  `protobuf:"bytes,1,opt,name=msg" json:"msg,omitempty"`
-	MsgType MsgType `protobuf:"varint,2,opt,name=msgType,enum=protos.MsgType" json:"msgType,omitempty"`
+	UserToken []string `protobuf:"bytes,1,rep,name=userToken" json:"userToken,omitempty"`
 }
 
 func (m *SocketPushReply) Reset()                    { *m = SocketPushReply{} }
@@ -131,23 +115,89 @@ func (m *SocketPushReply) String() string            { return proto.CompactTextS
 func (*SocketPushReply) ProtoMessage()               {}
 func (*SocketPushReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
+// Send mail request
+type MailRequest struct {
+	To      string `protobuf:"bytes,1,opt,name=to" json:"to,omitempty"`
+	Subject string `protobuf:"bytes,2,opt,name=subject" json:"subject,omitempty"`
+	Body    string `protobuf:"bytes,3,opt,name=body" json:"body,omitempty"`
+}
+
+func (m *MailRequest) Reset()                    { *m = MailRequest{} }
+func (m *MailRequest) String() string            { return proto.CompactTextString(m) }
+func (*MailRequest) ProtoMessage()               {}
+func (*MailRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+
+// Send mail response{
+type MailResponse struct {
+	Success bool `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+}
+
+func (m *MailResponse) Reset()                    { *m = MailResponse{} }
+func (m *MailResponse) String() string            { return proto.CompactTextString(m) }
+func (*MailResponse) ProtoMessage()               {}
+func (*MailResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+// chat msg request
+type ReceiveChatRequest struct {
+}
+
+func (m *ReceiveChatRequest) Reset()                    { *m = ReceiveChatRequest{} }
+func (m *ReceiveChatRequest) String() string            { return proto.CompactTextString(m) }
+func (*ReceiveChatRequest) ProtoMessage()               {}
+func (*ReceiveChatRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
+
+// chat msg reply
+type ReceiveChatReply struct {
+	Chat string `protobuf:"bytes,1,opt,name=chat" json:"chat,omitempty"`
+}
+
+func (m *ReceiveChatReply) Reset()                    { *m = ReceiveChatReply{} }
+func (m *ReceiveChatReply) String() string            { return proto.CompactTextString(m) }
+func (*ReceiveChatReply) ProtoMessage()               {}
+func (*ReceiveChatReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
+
+// Push msg request
+type SendChatRequest struct {
+}
+
+func (m *SendChatRequest) Reset()                    { *m = SendChatRequest{} }
+func (m *SendChatRequest) String() string            { return proto.CompactTextString(m) }
+func (*SendChatRequest) ProtoMessage()               {}
+func (*SendChatRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
+
+// push msg reply
+type SendChatReply struct {
+	Chat string `protobuf:"bytes,1,opt,name=chat" json:"chat,omitempty"`
+}
+
+func (m *SendChatReply) Reset()                    { *m = SendChatReply{} }
+func (m *SendChatReply) String() string            { return proto.CompactTextString(m) }
+func (*SendChatReply) ProtoMessage()               {}
+func (*SendChatReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
+
+// nil
 type Empty struct {
 }
 
 func (m *Empty) Reset()                    { *m = Empty{} }
 func (m *Empty) String() string            { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()               {}
-func (*Empty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
+func (*Empty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
 func init() {
 	proto.RegisterType((*HelloRequest)(nil), "protos.HelloRequest")
 	proto.RegisterType((*HelloReply)(nil), "protos.HelloReply")
-	proto.RegisterType((*PushRequest)(nil), "protos.PushRequest")
-	proto.RegisterType((*PushReply)(nil), "protos.PushReply")
+	proto.RegisterType((*ApplePushRequest)(nil), "protos.ApplePushRequest")
+	proto.RegisterType((*ApplePushReply)(nil), "protos.ApplePushReply")
 	proto.RegisterType((*SocketPushRequest)(nil), "protos.SocketPushRequest")
 	proto.RegisterType((*SocketPushReply)(nil), "protos.SocketPushReply")
+	proto.RegisterType((*MailRequest)(nil), "protos.MailRequest")
+	proto.RegisterType((*MailResponse)(nil), "protos.MailResponse")
+	proto.RegisterType((*ReceiveChatRequest)(nil), "protos.ReceiveChatRequest")
+	proto.RegisterType((*ReceiveChatReply)(nil), "protos.ReceiveChatReply")
+	proto.RegisterType((*SendChatRequest)(nil), "protos.SendChatRequest")
+	proto.RegisterType((*SendChatReply)(nil), "protos.SendChatReply")
 	proto.RegisterType((*Empty)(nil), "protos.Empty")
-	proto.RegisterEnum("protos.MsgType", MsgType_name, MsgType_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -160,9 +210,13 @@ type GPNSClient interface {
 	// Sends a greeting
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 	// Apple Push
-	ApplePush(ctx context.Context, in *PushRequest, opts ...grpc.CallOption) (*PushReply, error)
-	// Test websocket Push
-	TestSocketPush(ctx context.Context, in *SocketPushRequest, opts ...grpc.CallOption) (*SocketPushReply, error)
+	ApplePush(ctx context.Context, in *ApplePushRequest, opts ...grpc.CallOption) (*ApplePushReply, error)
+	// WebSocket Push
+	SocketPush(ctx context.Context, in *SocketPushRequest, opts ...grpc.CallOption) (*SocketPushReply, error)
+	// Mail send
+	SendMail(ctx context.Context, in *MailRequest, opts ...grpc.CallOption) (*MailResponse, error)
+	// Receive msg from client and deliver to backend
+	ReceiveMsg(ctx context.Context, in *ReceiveChatRequest, opts ...grpc.CallOption) (GPNS_ReceiveMsgClient, error)
 }
 
 type gPNSClient struct {
@@ -182,8 +236,8 @@ func (c *gPNSClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grp
 	return out, nil
 }
 
-func (c *gPNSClient) ApplePush(ctx context.Context, in *PushRequest, opts ...grpc.CallOption) (*PushReply, error) {
-	out := new(PushReply)
+func (c *gPNSClient) ApplePush(ctx context.Context, in *ApplePushRequest, opts ...grpc.CallOption) (*ApplePushReply, error) {
+	out := new(ApplePushReply)
 	err := grpc.Invoke(ctx, "/protos.GPNS/ApplePush", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -191,13 +245,54 @@ func (c *gPNSClient) ApplePush(ctx context.Context, in *PushRequest, opts ...grp
 	return out, nil
 }
 
-func (c *gPNSClient) TestSocketPush(ctx context.Context, in *SocketPushRequest, opts ...grpc.CallOption) (*SocketPushReply, error) {
+func (c *gPNSClient) SocketPush(ctx context.Context, in *SocketPushRequest, opts ...grpc.CallOption) (*SocketPushReply, error) {
 	out := new(SocketPushReply)
-	err := grpc.Invoke(ctx, "/protos.GPNS/TestSocketPush", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/protos.GPNS/SocketPush", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *gPNSClient) SendMail(ctx context.Context, in *MailRequest, opts ...grpc.CallOption) (*MailResponse, error) {
+	out := new(MailResponse)
+	err := grpc.Invoke(ctx, "/protos.GPNS/SendMail", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gPNSClient) ReceiveMsg(ctx context.Context, in *ReceiveChatRequest, opts ...grpc.CallOption) (GPNS_ReceiveMsgClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_GPNS_serviceDesc.Streams[0], c.cc, "/protos.GPNS/ReceiveMsg", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gPNSReceiveMsgClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GPNS_ReceiveMsgClient interface {
+	Recv() (*ReceiveChatReply, error)
+	grpc.ClientStream
+}
+
+type gPNSReceiveMsgClient struct {
+	grpc.ClientStream
+}
+
+func (x *gPNSReceiveMsgClient) Recv() (*ReceiveChatReply, error) {
+	m := new(ReceiveChatReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // Server API for GPNS service
@@ -206,9 +301,13 @@ type GPNSServer interface {
 	// Sends a greeting
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 	// Apple Push
-	ApplePush(context.Context, *PushRequest) (*PushReply, error)
-	// Test websocket Push
-	TestSocketPush(context.Context, *SocketPushRequest) (*SocketPushReply, error)
+	ApplePush(context.Context, *ApplePushRequest) (*ApplePushReply, error)
+	// WebSocket Push
+	SocketPush(context.Context, *SocketPushRequest) (*SocketPushReply, error)
+	// Mail send
+	SendMail(context.Context, *MailRequest) (*MailResponse, error)
+	// Receive msg from client and deliver to backend
+	ReceiveMsg(*ReceiveChatRequest, GPNS_ReceiveMsgServer) error
 }
 
 func RegisterGPNSServer(s *grpc.Server, srv GPNSServer) {
@@ -228,7 +327,7 @@ func _GPNS_SayHello_Handler(srv interface{}, ctx context.Context, dec func(inter
 }
 
 func _GPNS_ApplePush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(PushRequest)
+	in := new(ApplePushRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -239,16 +338,49 @@ func _GPNS_ApplePush_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return out, nil
 }
 
-func _GPNS_TestSocketPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_SocketPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
 	in := new(SocketPushRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).TestSocketPush(ctx, in)
+	out, err := srv.(GPNSServer).SocketPush(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
+}
+
+func _GPNS_SendMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(MailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(GPNSServer).SendMail(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _GPNS_ReceiveMsg_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReceiveChatRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GPNSServer).ReceiveMsg(m, &gPNSReceiveMsgServer{stream})
+}
+
+type GPNS_ReceiveMsgServer interface {
+	Send(*ReceiveChatReply) error
+	grpc.ServerStream
+}
+
+type gPNSReceiveMsgServer struct {
+	grpc.ServerStream
+}
+
+func (x *gPNSReceiveMsgServer) Send(m *ReceiveChatReply) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 var _GPNS_serviceDesc = grpc.ServiceDesc{
@@ -264,38 +396,54 @@ var _GPNS_serviceDesc = grpc.ServiceDesc{
 			Handler:    _GPNS_ApplePush_Handler,
 		},
 		{
-			MethodName: "TestSocketPush",
-			Handler:    _GPNS_TestSocketPush_Handler,
+			MethodName: "SocketPush",
+			Handler:    _GPNS_SocketPush_Handler,
+		},
+		{
+			MethodName: "SendMail",
+			Handler:    _GPNS_SendMail_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ReceiveMsg",
+			Handler:       _GPNS_ReceiveMsg_Handler,
+			ServerStreams: true,
+		},
+	},
 }
 
 var fileDescriptor0 = []byte{
-	// 398 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x53, 0x4b, 0x6f, 0xda, 0x40,
-	0x10, 0xc6, 0x18, 0xd7, 0x78, 0xa8, 0x78, 0x4c, 0x91, 0xea, 0x5a, 0x3d, 0x20, 0x9f, 0xda, 0x1e,
-	0x38, 0xd0, 0x87, 0x50, 0xd5, 0x43, 0x51, 0x44, 0x5e, 0x52, 0x08, 0x5a, 0x23, 0xe5, 0xec, 0x38,
-	0x1b, 0x12, 0xe1, 0x57, 0xbc, 0x36, 0x8a, 0x7f, 0x5c, 0x7e, 0x40, 0xfe, 0x55, 0xd6, 0x5e, 0x56,
-	0x98, 0x84, 0x28, 0x87, 0x9c, 0x98, 0x99, 0x6f, 0xbe, 0x99, 0xef, 0x1b, 0xd6, 0x60, 0x24, 0xb1,
-	0x37, 0x8c, 0x93, 0x28, 0x8d, 0xf0, 0x43, 0xf9, 0xc3, 0xec, 0x5f, 0xf0, 0xf1, 0x98, 0xfa, 0x7e,
-	0x44, 0xe8, 0x5d, 0x46, 0x59, 0x8a, 0x08, 0x8d, 0xd0, 0x0d, 0xa8, 0xa9, 0x0c, 0x94, 0x6f, 0x06,
-	0x29, 0x63, 0xec, 0x82, 0xea, 0x2e, 0xa9, 0x59, 0xe7, 0x25, 0x8d, 0x14, 0xa1, 0x3d, 0x06, 0xd8,
-	0xb0, 0x62, 0x3f, 0x47, 0x13, 0xf4, 0x80, 0x32, 0x56, 0xf4, 0x08, 0x9a, 0x4c, 0xf7, 0x30, 0x1f,
-	0x15, 0x68, 0xcd, 0x33, 0x76, 0x23, 0xf7, 0xbd, 0xce, 0x1d, 0x40, 0xeb, 0x8a, 0xae, 0x6f, 0x3d,
-	0xba, 0x88, 0x56, 0x34, 0xe4, 0x33, 0x54, 0x8e, 0x56, 0x4b, 0xf8, 0x1f, 0x0c, 0x7a, 0x9f, 0x26,
-	0xee, 0x49, 0x78, 0x1d, 0x99, 0x2a, 0xc7, 0x5b, 0x23, 0x5b, 0xd8, 0x63, 0xc3, 0xca, 0x8e, 0xe1,
-	0x54, 0x36, 0x4d, 0xc3, 0x34, 0xc9, 0xc9, 0x96, 0x64, 0xfd, 0x83, 0xf6, 0x2e, 0x58, 0x28, 0x5e,
-	0xd1, 0x7c, 0xa3, 0xa5, 0x08, 0xb1, 0x0f, 0xda, 0xda, 0xf5, 0x33, 0xe1, 0xc2, 0x20, 0x22, 0xf9,
-	0x5b, 0x1f, 0x2b, 0xf6, 0x01, 0x18, 0x62, 0x4d, 0x71, 0x04, 0xde, 0xe6, 0x45, 0x59, 0x98, 0x96,
-	0x54, 0x8d, 0x88, 0xe4, 0x6d, 0x13, 0xf6, 0x1c, 0x7a, 0x4e, 0xe4, 0xad, 0x68, 0x5a, 0xbd, 0x0a,
-	0x57, 0x11, 0xb0, 0xa5, 0x54, 0xc1, 0x43, 0xfc, 0xce, 0xef, 0xc4, 0x96, 0x8b, 0x3c, 0x16, 0x3a,
-	0xda, 0xa3, 0x8e, 0x74, 0x7a, 0x26, 0xca, 0x44, 0xe2, 0xf6, 0x0c, 0x3a, 0xd5, 0x89, 0x85, 0xb8,
-	0x77, 0xcd, 0xd3, 0x41, 0x9b, 0x06, 0x71, 0x9a, 0xff, 0xf8, 0x0a, 0xfa, 0x06, 0xc4, 0x26, 0x34,
-	0x4e, 0x9d, 0xf3, 0x59, 0xb7, 0x86, 0x3a, 0xa8, 0x64, 0x72, 0xd1, 0x55, 0x46, 0x0f, 0x0a, 0x34,
-	0x8e, 0xe6, 0x33, 0x07, 0xff, 0x40, 0xd3, 0x71, 0xf3, 0xf2, 0x7d, 0x60, 0x5f, 0x4e, 0xad, 0x3e,
-	0x32, 0x0b, 0x9f, 0x55, 0xb9, 0x44, 0xbb, 0x86, 0xbf, 0xc1, 0x98, 0xc4, 0xb1, 0x4f, 0x0b, 0xd9,
-	0xf8, 0x69, 0xcf, 0x1f, 0x69, 0xf5, 0x76, 0x8b, 0x82, 0x76, 0x08, 0xed, 0x05, 0x07, 0xb7, 0x96,
-	0xf1, 0x8b, 0x6c, 0x7b, 0x71, 0x58, 0xeb, 0xf3, 0x3e, 0xa8, 0x9c, 0x73, 0x29, 0xbe, 0x88, 0x9f,
-	0x4f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x47, 0x08, 0x3b, 0x9b, 0x25, 0x03, 0x00, 0x00,
+	// 487 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x8c, 0x54, 0xdb, 0x6e, 0xd3, 0x40,
+	0x10, 0xc5, 0x49, 0x43, 0xeb, 0x49, 0x09, 0xe9, 0x10, 0x81, 0xb1, 0x78, 0xa8, 0x16, 0x09, 0xfa,
+	0x14, 0x50, 0x40, 0x50, 0x21, 0x24, 0x04, 0x28, 0x5c, 0x54, 0x15, 0x55, 0x0e, 0x3f, 0xe0, 0x38,
+	0x43, 0x1b, 0xe2, 0x78, 0x8d, 0x77, 0x1d, 0xe1, 0xff, 0xe3, 0x0f, 0xf8, 0x21, 0x76, 0xbd, 0x5e,
+	0xe2, 0xa4, 0x8e, 0xe0, 0x29, 0xb3, 0x33, 0x73, 0xce, 0x9c, 0xb9, 0xc4, 0xe0, 0x66, 0x69, 0x34,
+	0x4c, 0x33, 0x2e, 0x39, 0xde, 0x2c, 0x7f, 0x04, 0x7b, 0x0e, 0x87, 0x9f, 0x28, 0x8e, 0x79, 0x40,
+	0x3f, 0x72, 0x12, 0x12, 0x11, 0xf6, 0x92, 0x70, 0x49, 0x9e, 0x73, 0xec, 0x9c, 0xb8, 0x41, 0x69,
+	0x63, 0x1f, 0xda, 0xe1, 0x25, 0x79, 0x2d, 0xe5, 0xea, 0x04, 0xda, 0x64, 0xa7, 0x00, 0x15, 0x2a,
+	0x8d, 0x0b, 0xf4, 0x60, 0x7f, 0x49, 0x42, 0xe8, 0x1c, 0x03, 0xb3, 0xcf, 0x06, 0xe4, 0x6f, 0x07,
+	0xfa, 0x6f, 0xd3, 0x34, 0xa6, 0x8b, 0x5c, 0x5c, 0xd9, 0xa2, 0xbb, 0x09, 0x8e, 0xa1, 0x3b, 0xa3,
+	0xd5, 0x3c, 0xa2, 0xaf, 0x7c, 0x41, 0x89, 0x22, 0x6a, 0xab, 0x68, 0xdd, 0x85, 0x63, 0x70, 0xe9,
+	0xa7, 0xcc, 0xc2, 0xcf, 0xc9, 0x37, 0xee, 0xb5, 0x55, 0xbc, 0x3b, 0x7a, 0x6c, 0x7a, 0x14, 0xc3,
+	0xed, 0x42, 0xc3, 0xb1, 0xcd, 0x1c, 0x27, 0x32, 0x2b, 0x82, 0x35, 0xd2, 0x7f, 0x0d, 0xbd, 0xcd,
+	0xa0, 0xd6, 0xbe, 0xa0, 0xa2, 0x12, 0xa4, 0x4d, 0x1c, 0x40, 0x67, 0x15, 0xc6, 0xb9, 0xe9, 0xc7,
+	0x0d, 0xcc, 0xe3, 0x55, 0xeb, 0xd4, 0x61, 0x23, 0xe8, 0xd5, 0x6a, 0xe9, 0x99, 0xfc, 0x53, 0x38,
+	0x3b, 0x83, 0xa3, 0x09, 0x8f, 0x16, 0x24, 0xff, 0x6f, 0x12, 0x0f, 0xc0, 0xcd, 0x05, 0x65, 0x75,
+	0xba, 0xb5, 0x83, 0x3d, 0x81, 0xdb, 0x75, 0x32, 0xad, 0x60, 0x03, 0xe0, 0x6c, 0x03, 0xce, 0xa0,
+	0x7b, 0x1e, 0xce, 0x63, 0x5b, 0xb7, 0x07, 0x2d, 0xc9, 0xab, 0x92, 0xca, 0xd2, 0x3a, 0x44, 0x3e,
+	0xfd, 0x4e, 0x91, 0xac, 0x9a, 0xb5, 0x4f, 0x7d, 0x20, 0x53, 0x3e, 0x2b, 0xd4, 0xa8, 0xcb, 0x03,
+	0xd1, 0x36, 0x3b, 0x81, 0x43, 0x43, 0x26, 0x52, 0x9e, 0x08, 0x32, 0xe8, 0x28, 0x52, 0xca, 0x4b,
+	0xca, 0x83, 0xc0, 0x3e, 0xd9, 0x00, 0x30, 0xa0, 0x88, 0xe6, 0x2b, 0x7a, 0x7f, 0x15, 0xca, 0xaa,
+	0x3a, 0x7b, 0x04, 0xfd, 0x0d, 0xaf, 0x96, 0xaf, 0xea, 0x44, 0xea, 0x61, 0x0f, 0x51, 0xdb, 0xec,
+	0x48, 0x75, 0x49, 0xc9, 0xac, 0x0e, 0x7d, 0x08, 0xb7, 0xd6, 0xae, 0x5d, 0xb8, 0x7d, 0xe8, 0x8c,
+	0x97, 0xa9, 0x2c, 0x46, 0xbf, 0x5a, 0xb0, 0xf7, 0xf1, 0xe2, 0xcb, 0x04, 0x5f, 0xc0, 0xc1, 0x24,
+	0x2c, 0xca, 0x1b, 0xc6, 0x81, 0x3d, 0x97, 0xfa, 0x1f, 0xc1, 0xc7, 0x2d, 0xaf, 0xe2, 0x66, 0x37,
+	0xf0, 0x0d, 0xb8, 0x7f, 0x17, 0x8d, 0xde, 0xae, 0x3b, 0xf3, 0xef, 0x36, 0x44, 0x0c, 0xc1, 0x3b,
+	0x80, 0xf5, 0xa2, 0xf0, 0xbe, 0xcd, 0xbb, 0x76, 0x09, 0xfe, 0xbd, 0xa6, 0x90, 0xe1, 0x78, 0xa9,
+	0xc4, 0xab, 0x9e, 0xf5, 0xc8, 0xf1, 0x8e, 0x4d, 0xab, 0x6d, 0xd3, 0x1f, 0x6c, 0x3a, 0xcd, 0x56,
+	0x14, 0xf0, 0x03, 0x40, 0x35, 0xe7, 0x73, 0x71, 0x89, 0xbe, 0xcd, 0xba, 0xbe, 0x11, 0xdf, 0x6b,
+	0x8c, 0x95, 0xe5, 0x9f, 0x3a, 0x53, 0xf3, 0xf1, 0x78, 0xf6, 0x27, 0x00, 0x00, 0xff, 0xff, 0xa0,
+	0xbd, 0xb2, 0xd1, 0x50, 0x04, 0x00, 0x00,
 }

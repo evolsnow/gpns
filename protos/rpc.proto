@@ -10,52 +10,85 @@ service GPNS {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
 
   // Apple Push
-  rpc ApplePush (PushRequest) returns (PushReply) {}
+  rpc ApplePush (ApplePushRequest) returns (ApplePushReply) {}
 
-  // Test websocket Push
-  rpc TestSocketPush (SocketPushRequest) returns (SocketPushReply) {}
+  // WebSocket Push
+  rpc SocketPush (SocketPushRequest) returns (SocketPushReply) {}
+
+  // Mail send
+  rpc SendMail (MailRequest) returns (MailResponse) {}
+
+  // Receive msg from client and deliver to backend
+  rpc ReceiveMsg (ReceiveChatRequest) returns (stream ReceiveChatReply) {}
+
+  // Send msg to client
 
 }
 
 // The request message containing the user's name.
 message HelloRequest {
-  string name = 1;
-  int32 age = 2;
+    string name = 1;
+    int32 age = 2;
 }
 
 // The response message containing the greetings
 message HelloReply {
-  string message = 1;
-  int32 age = 2;
+    string message = 1;
+    int32 age = 2;
 }
 
-// Push request, containing push message and repeated device token
-message PushRequest{
-  string message = 1;
-  repeated string deviceToken = 2;
-  map<string, string> extraInfo = 3;
+// Apple push request, containing push message and repeated device token
+message ApplePushRequest {
+    string message = 1;
+    repeated string deviceToken = 2;
+    map<string, string> extraInfo = 3;
 }
 
-// Push response, containing numbers of successful push and failed token list
-message PushReply{
-  int32 count = 1;
-  repeated string deviceToken = 2;
+// Apple push response, containing numbers of successful push and failed device list
+message ApplePushReply {
+    repeated string deviceToken = 2;
 }
 
-// Test websocket push
-enum MsgType {
-    JSON = 0;
-    RAW = 1;
-  }
-
-message SocketPushRequest{
-  string msg = 1;
-  MsgType msgType = 2;
+// webSocket push
+message SocketPushRequest {
+    string message = 1;
+    repeated string userToken = 2;
 }
 
-message SocketPushReply{
-  string msg = 1;
-  MsgType msgType = 2;
+// webSocket failed user token
+message SocketPushReply {
+    repeated string userToken = 1;
 }
 
+// Send mail request
+message MailRequest {
+    string to = 1;
+    string subject = 2;
+    string body = 3;
+}
+
+// Send mail response{
+message MailResponse {
+    bool success = 1;
+}
+
+// chat msg request
+message ReceiveChatRequest {
+}
+
+// chat msg reply
+message ReceiveChatReply {
+    string chat = 1;
+}
+
+// Push msg request
+message SendChatRequest {
+}
+
+// push msg reply
+message SendChatReply {
+    string chat = 1;
+}
+
+// nil
 message Empty {}

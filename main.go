@@ -5,8 +5,8 @@ import (
 	"fmt"
 	pb "github.com/evolsnow/gpns/protos"
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/common/log"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 	"net/http"
 )
@@ -17,8 +17,7 @@ func main() {
 	flag.Parse()
 	// http server
 	router := httprouter.New()
-	router.GET("/websocket", RawSocket)
-	router.GET("/websocket/:token", AuthedSocket)
+	router.GET("/websocket/:deviceToken", webSocket)
 	go func() {
 		log.Fatal(http.ListenAndServe(":10000", router))
 	}()
@@ -26,7 +25,7 @@ func main() {
 	// rpc server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatal("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterGPNSServer(s, &server{})

@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/evolsnow/httprouter"
+	"github.com/evolsnow/samaritan/common/log"
 	"github.com/gorilla/websocket"
 	"github.com/nu7hatch/gouuid"
-	"log"
 	"net/http"
 )
 
@@ -12,35 +12,45 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 	return true
 }} // use default options for webSocket
 
-var socketMap = make(map[string]*websocket.Conn)
+var socketConnMap = make(map[string]*websocket.Conn)
+var chats = make(chan string, 100)
 
-func establishWebSocketConn(w http.ResponseWriter, r *http.Request, uid string) {
+//keep deviceToken and connection
+func webSocket(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ah := r.Header.Get("Authorization")
+	if ah != "" {
+		//iOS
+		//if dt := ps.ByName("deviceToken"); dt != "" {
+		//	deviceMap[ah] = dt
+		//}
+	} else {
+		u4, _ := uuid.NewV4()
+		ah = u4.String()
+	}
+	establishSocketConn(w, r, ah)
+}
+
+func establishSocketConn(w http.ResponseWriter, r *http.Request, ut string) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("upgrade:", err)
+		log.Warn("upgrade:", err)
 		return
 	}
-	socketMap[uid] = c
-	log.Println("new socket conn:", uid)
+	socketConnMap[ut] = c
+	log.Info("new socket conn:", ut)
 	defer c.Close()
-	defer delete(socketMap, uid)
+	defer delete(socketConnMap, ut)
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
-			log.Println("read:", err)
+			log.Warn("read:", err)
 			break
 		}
-		log.Printf("recv: %s", message)
+		log.Debug("rec: %s", message)
+		go handlerMsg(message)
 	}
 }
 
-func RawSocket(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u4, _ := uuid.NewV4()
-	uid := u4.String()
-	establishWebSocketConn(w, r, uid)
-}
-
-func AuthedSocket(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	uid := ps.Get("token")
-	establishWebSocketConn(w, r, uid)
+func handlerMsg(msg []byte) {
+	chats <- string(msg)
 }
