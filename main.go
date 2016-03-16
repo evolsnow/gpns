@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 	// http server
 	router := httprouter.New()
-	router.GET("/websocket/:deviceToken", webSocket)
+	router.GET("/websocket", webSocket)
 	go func() {
 		log.Fatal(http.ListenAndServe(":10000", router))
 	}()
