@@ -87,16 +87,22 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 // Mail send
 func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailResponse, error) {
 	now := time.Now()
-	smtpServer := "mail.samaritan.tech"
+	//smtpServer := "mail.samaritan.tech"
+	//auth := smtp.PlainAuth(
+	//	"",
+	//	"user",
+	//	"password",
+	//	smtpServer,
+	//)
+	smtpServer := "smtp.gmail.com"
 	auth := smtp.PlainAuth(
 		"",
-		"admin",
-		"passwdforadmin",
+		"godo.noreply@gmail.com",
+		"password",
 		smtpServer,
 	)
-
-	from := mail.Address{"Samaritan", "admin@mail.samaritan.tech"}
-	to := mail.Address{"收件人", in.To}
+	from := mail.Address{Name: "GoDo", Address: "godo.noreply@gmail.com"}
+	to := mail.Address{Name: in.To, Address: in.To}
 	title := in.Subject
 	body := in.Body
 
@@ -121,7 +127,7 @@ func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailRespo
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	err := smtp.SendMail(
-		smtpServer+":25",
+		smtpServer+":587",
 		auth,
 		from.Address,
 		[]string{to.Address},

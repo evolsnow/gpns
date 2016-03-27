@@ -10,8 +10,8 @@ import (
 
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
-	addr := mail.Address{String, ""}
-	return strings.Trim(addr.String(), "<@>")
+	address := mail.Address{Name: String, Address: ""}
+	return strings.Trim(address.String(), "<@>")
 }
 
 func makeMessageId(domain string) string {
@@ -19,5 +19,5 @@ func makeMessageId(domain string) string {
 	utcDate := now.Format("20060102150405")
 	rdm := rand.New(rand.NewSource(now.UnixNano()))
 	randInt := rdm.Intn(100000)
-	return fmt.Sprintf("<%d.%d@%s>", utcDate, randInt, domain)
+	return fmt.Sprintf("<%s.%d@%s>", utcDate, randInt, domain)
 }

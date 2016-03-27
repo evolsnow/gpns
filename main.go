@@ -25,7 +25,7 @@ func main() {
 	// rpc server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		log.Fatal("failed to listen: %v", err)
+		log.Fatal("failed to listen", err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterGPNSServer(s, &server{})
