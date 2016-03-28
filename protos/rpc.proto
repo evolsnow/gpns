@@ -18,11 +18,11 @@ service GPNS {
   // Mail send
   rpc SendMail (MailRequest) returns (MailResponse) {}
 
+  // Send SMS
+  rpc SendSMS (SMSRequest) returns (SMSResponse) {}
+
   // Receive msg from client and deliver to backend
   rpc ReceiveMsg (ReceiveChatRequest) returns (stream ReceiveChatReply) {}
-
-  // Send msg to client
-
 }
 
 // The request message containing the user's name.
@@ -72,21 +72,24 @@ message MailResponse {
     bool success = 1;
 }
 
+// Send sms request
+message SMSRequest {
+    string to = 1;
+    string text = 2;
+}
+
+// Send sms response{
+message SMSResponse {
+    bool success = 1;
+    string reason = 2;
+}
+
 // chat msg request
 message ReceiveChatRequest {
 }
 
 // chat msg reply
 message ReceiveChatReply {
-    string chat = 1;
-}
-
-// Push msg request
-message SendChatRequest {
-}
-
-// push msg reply
-message SendChatReply {
     string chat = 1;
 }
 

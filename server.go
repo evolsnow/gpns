@@ -2,16 +2,19 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	pb "github.com/evolsnow/gpns/protos"
 	"github.com/evolsnow/samaritan/common/log"
+	pb "github.com/evolsnow/samaritan/gpns/protos"
 	"github.com/gorilla/websocket"
 	apns "github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
 	"github.com/sideshow/apns2/payload"
 	"golang.org/x/net/context"
+	"net/http"
 	"net/mail"
 	"net/smtp"
+	"net/url"
 	"sync"
 	"time"
 )
@@ -24,7 +27,7 @@ func (s server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRep
 	return &pb.HelloReply{Message: "Hello " + in.Name, Age: 24}, nil
 }
 
-// Socket push
+// SocketPush push msg to user specified tokens with websocket
 func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
 	offline := make([]string, len(in.UserToken))
 	for _, ut := range in.UserToken {
@@ -46,7 +49,7 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 	return &pb.SocketPushReply{UserToken: offline}, nil
 }
 
-// ApplePush
+// ApplePush push msg with apns
 func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.ApplePushReply, error) {
 	cert, err := certificate.FromPemFile("dev.pem", "")
 	if err != nil {
@@ -84,7 +87,7 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 	return reply, nil
 }
 
-// Mail send
+// SendMail send code with gmail
 func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailResponse, error) {
 	now := time.Now()
 	//smtpServer := "mail.samaritan.tech"
@@ -137,7 +140,29 @@ func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailRespo
 	return new(pb.MailResponse), err
 }
 
-// Chat Msg from app
+// SendSMS send sms to mobile with yunpian
+func (s server) SendSMS(ctx context.Context, in *pb.SMSRequest) (*pb.SMSResponse, error) {
+	apiKey := "apikey"
+	ypURL := "https://sms.yunpian.com/v1/sms/send.json"
+	resp, err := http.PostForm(ypURL, url.Values{"apikey": {apiKey}, "mobile": {in.To}, "text": {in.Text}})
+	if err != nil {
+		log.Error(err.Error())
+	}
+	defer resp.Body.Close()
+	type ypReply struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}
+	reply := new(ypReply)
+	decoder := json.NewDecoder(resp.Body)
+	decoder.Decode(reply)
+	if reply.Code != 0 {
+		return &pb.SMSResponse{Success: false, Reason: reply.Msg}, nil
+	}
+	return &pb.SMSResponse{Success: true}, nil
+}
+
+// ReceiveMsg receive Chat Msg from app
 func (s server) ReceiveMsg(in *pb.ReceiveChatRequest, stream pb.GPNS_ReceiveMsgServer) error {
 	for {
 		c := <-chats

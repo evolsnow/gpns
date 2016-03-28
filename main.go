@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	pb "github.com/evolsnow/gpns/protos"
 	"github.com/evolsnow/httprouter"
 	"github.com/evolsnow/samaritan/common/log"
+	pb "github.com/evolsnow/samaritan/gpns/protos"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
