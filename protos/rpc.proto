@@ -53,6 +53,7 @@ message ApplePushReply {
 message SocketPushRequest {
     string message = 1;
     repeated string userToken = 2;
+    map<string, string> extraInfo = 3;
 }
 
 // webSocket failed user token

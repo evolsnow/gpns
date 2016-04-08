@@ -30,6 +30,12 @@ func (s server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRep
 // SocketPush push msg to user specified tokens with websocket
 func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
 	offline := make([]string, len(in.UserToken))
+	payload := make(map[string]string)
+	payload["message"] = in.Message
+	for k, v := range in.ExtraInfo {
+		payload[k] = v
+	}
+	raw, _ := json.Marshal(payload)
 	for _, ut := range in.UserToken {
 		var (
 			v  *websocket.Conn
@@ -39,7 +45,7 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 			offline = append(offline, ut)
 			continue
 		}
-		err := v.WriteMessage(websocket.TextMessage, []byte(in.Message))
+		err := v.WriteMessage(websocket.TextMessage, raw)
 		if err != nil {
 			//client closed
 			offline = append(offline, ut)
