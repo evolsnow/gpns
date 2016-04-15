@@ -8,12 +8,13 @@ import (
 	"time"
 )
 
+//use mail's rfc2047 to encode any string
 func encodeRFC2047(String string) string {
-	// use mail's rfc2047 to encode any string
 	address := mail.Address{Name: String, Address: ""}
 	return strings.Trim(address.String(), "<@>")
 }
 
+//make mail message id
 func makeMessageId(domain string) string {
 	now := time.Now()
 	utcDate := now.Format("20060102150405")

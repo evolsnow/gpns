@@ -30,6 +30,7 @@ func webSocket(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	establishSocketConn(w, r, ah)
 }
 
+//establish socket connection with token
 func establishSocketConn(w http.ResponseWriter, r *http.Request, ut string) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -51,6 +52,7 @@ func establishSocketConn(w http.ResponseWriter, r *http.Request, ut string) {
 	}
 }
 
+//send msg to channel
 func handlerMsg(msg []byte) {
 	chats <- string(msg)
 }

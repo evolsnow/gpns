@@ -29,6 +29,6 @@ func main() {
 	}
 	s := grpc.NewServer()
 	pb.RegisterGPNSServer(s, &server{})
-	log.Println("listen on", fmt.Sprintf(":%d", *port))
+	log.Info("listen on", fmt.Sprintf(":%d", *port))
 	s.Serve(lis)
 }
