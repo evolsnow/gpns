@@ -19,7 +19,7 @@ var cfg *Config
 func main() {
 	var conf string
 	var err error
-	flag.StringVar(&conf, "c", "config.json", "specify config file")
+	flag.StringVar(&conf, "c", "rpc.json", "specify config file")
 	flag.Parse()
 	cfg, err = parseConfig(conf)
 	if err != nil {
