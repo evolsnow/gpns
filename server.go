@@ -59,12 +59,16 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 // ApplePush push msg with apns
 func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.ApplePushReply, error) {
 	log.Info("calling apple push")
-	cert, err := certificate.FromPemFile("dev.pem", "123456")
+	cert, err := certificate.FromPemFile(cfg.Cert, cfg.CertPassword)
 	if err != nil {
 		log.Error(err)
 	}
-	client := apns.NewClient(cert).Development()
-
+	var client *apns.Client
+	if cfg.Production {
+		client = apns.NewClient(cert).Production()
+	} else {
+		client = apns.NewClient(cert).Development()
+	}
 	payload := payload.NewPayload()
 	payload.Alert(in.Message)
 	payload.Sound("default")
@@ -110,7 +114,7 @@ func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailRespo
 	auth := smtp.PlainAuth(
 		"",
 		"godo.noreply@gmail.com",
-		"password",
+		cfg.MailPassword,
 		smtpServer,
 	)
 	from := mail.Address{Name: "GoDo", Address: "godo.noreply@gmail.com"}
@@ -152,7 +156,7 @@ func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailRespo
 // SendSMS send sms to mobile with yunpian
 func (s server) SendSMS(ctx context.Context, in *pb.SMSRequest) (*pb.SMSResponse, error) {
 	log.Info("calling send sms")
-	apiKey := "apikey"
+	apiKey := cfg.ApiKey
 	ypURL := "https://sms.yunpian.com/v1/sms/send.json"
 	resp, err := http.PostForm(ypURL, url.Values{"apikey": {apiKey}, "mobile": {in.To}, "text": {in.Text}})
 	if err != nil {
