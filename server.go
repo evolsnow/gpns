@@ -29,7 +29,8 @@ func (s server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRep
 
 // SocketPush push msg to user specified tokens with websocket
 func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
-	offline := make([]string, len(in.UserToken))
+	log.Info("calling socket push")
+	var offline []string
 	payload := make(map[string]string)
 	payload["message"] = in.Message
 	for k, v := range in.ExtraInfo {
@@ -57,6 +58,7 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 
 // ApplePush push msg with apns
 func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.ApplePushReply, error) {
+	log.Info("calling apple push")
 	cert, err := certificate.FromPemFile("dev.pem", "")
 	if err != nil {
 		log.Error(err)
@@ -95,6 +97,7 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 
 // SendMail send code with gmail
 func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailResponse, error) {
+	log.Info("calling send mail")
 	now := time.Now()
 	//smtpServer := "mail.samaritan.tech"
 	//auth := smtp.PlainAuth(
@@ -148,6 +151,7 @@ func (s server) SendMail(ctx context.Context, in *pb.MailRequest) (*pb.MailRespo
 
 // SendSMS send sms to mobile with yunpian
 func (s server) SendSMS(ctx context.Context, in *pb.SMSRequest) (*pb.SMSResponse, error) {
+	log.Info("calling send sms")
 	apiKey := "apikey"
 	ypURL := "https://sms.yunpian.com/v1/sms/send.json"
 	resp, err := http.PostForm(ypURL, url.Values{"apikey": {apiKey}, "mobile": {in.To}, "text": {in.Text}})
