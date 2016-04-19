@@ -215,6 +215,10 @@ func init() {
 var _ context.Context
 var _ grpc.ClientConn
 
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion2
+
 // Client API for GPNS service
 
 type GPNSClient interface {
@@ -338,64 +342,94 @@ func RegisterGPNSServer(s *grpc.Server, srv GPNSServer) {
 	s.RegisterService(&_GPNS_serviceDesc, srv)
 }
 
-func _GPNS_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HelloRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).SayHello(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(GPNSServer).SayHello(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.GPNS/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GPNSServer).SayHello(ctx, req.(*HelloRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _GPNS_ApplePush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_ApplePush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ApplePushRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).ApplePush(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(GPNSServer).ApplePush(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.GPNS/ApplePush",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GPNSServer).ApplePush(ctx, req.(*ApplePushRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _GPNS_SocketPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_SocketPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SocketPushRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).SocketPush(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(GPNSServer).SocketPush(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.GPNS/SocketPush",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GPNSServer).SocketPush(ctx, req.(*SocketPushRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _GPNS_SendMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_SendMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).SendMail(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(GPNSServer).SendMail(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.GPNS/SendMail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GPNSServer).SendMail(ctx, req.(*MailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-func _GPNS_SendSMS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _GPNS_SendSMS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SMSRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(GPNSServer).SendSMS(ctx, in)
-	if err != nil {
-		return nil, err
+	if interceptor == nil {
+		return srv.(GPNSServer).SendSMS(ctx, in)
 	}
-	return out, nil
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.GPNS/SendSMS",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GPNSServer).SendSMS(ctx, req.(*SMSRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _GPNS_ReceiveMsg_Handler(srv interface{}, stream grpc.ServerStream) error {
