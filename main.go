@@ -47,6 +47,7 @@ func main() {
 type Config struct {
 	Port         int    `json:"port,omitempty"`
 	Cert         string `json:"cert"`
+        Topic        string `json:"topic"`
 	CertPassword string `json:"cert_password,omitempty"`
 	Production   bool   `json:"production,omitempty"`
 	MailPassword string `json:"mail_password,omitempty"`
