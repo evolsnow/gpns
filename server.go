@@ -82,7 +82,7 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 	for _, token := range in.DeviceToken {
 		nf := new(apns.Notification)
 		nf.DeviceToken = token
-
+                nf.Topic = cfg.Topic
 		nf.Payload = payload
 		go func(*apns.Notification) {
 			defer wg.Done()
