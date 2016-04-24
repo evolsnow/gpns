@@ -1,8 +1,9 @@
 {
   "port": 10086,
-  "cert": "dev.pem",
+  "cert": "push.p12",
   "cert_password": "123456",
-  "production": false,
+  "topic": "com.bundle.id"
+  "production": true,
   "mail_password": "123456",
   "api_key": "api_key"
 }
