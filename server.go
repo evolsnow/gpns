@@ -59,7 +59,7 @@ func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.S
 // ApplePush push msg with apns
 func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.ApplePushReply, error) {
 	log.Info("calling apple push")
-	cert, err := certificate.FromPemFile(cfg.Cert, cfg.CertPassword)
+	cert, err := certificate.FromP12File(cfg.Cert, cfg.CertPassword)
 	if err != nil {
 		log.Error(err)
 	}
