@@ -2,7 +2,7 @@
   "port": 10086,
   "cert": "push.p12",
   "cert_password": "123456",
-  "topic": "com.bundle.id"
+  "topic": "com.bundle.id",
   "production": true,
   "mail_password": "123456",
   "api_key": "api_key"
