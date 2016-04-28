@@ -31,11 +31,12 @@ func (s server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRep
 func (s server) SocketPush(ctx context.Context, in *pb.SocketPushRequest) (*pb.SocketPushReply, error) {
 	log.Info("calling socket push")
 	var offline []string
-	payload := make(map[string]string)
+	payload := make(map[string]interface{})
 	payload["message"] = in.Message
 	for k, v := range in.ExtraInfo {
 		payload[k] = v
 	}
+	payload["time"] = in.Time
 	raw, _ := json.Marshal(payload)
 	for _, ut := range in.UserToken {
 		var (
@@ -71,6 +72,7 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 	}
 	payload := payload.NewPayload()
 	payload.Alert(in.Message)
+	payload.Custom("time", in.Time)
 	payload.Sound("default")
 	payload.Badge(1)
 	for k, v := range in.ExtraInfo {
@@ -82,7 +84,7 @@ func (s server) ApplePush(ctx context.Context, in *pb.ApplePushRequest) (*pb.App
 	for _, token := range in.DeviceToken {
 		nf := new(apns.Notification)
 		nf.DeviceToken = token
-                nf.Topic = cfg.Topic
+		nf.Topic = cfg.Topic
 		nf.Payload = payload
 		go func(*apns.Notification) {
 			defer wg.Done()

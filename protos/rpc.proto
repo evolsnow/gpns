@@ -40,8 +40,9 @@ message HelloReply {
 // Apple push request, containing push message and repeated device token
 message ApplePushRequest {
     string message = 1;
-    repeated string deviceToken = 2;
+    int64 time = 2;
     map<string, string> extraInfo = 3;
+    repeated string deviceToken = 4;
 }
 
 // Apple push response, containing numbers of successful push and failed device list
@@ -52,8 +53,9 @@ message ApplePushReply {
 // webSocket push
 message SocketPushRequest {
     string message = 1;
-    repeated string userToken = 2;
+    int64 time = 2;
     map<string, string> extraInfo = 3;
+    repeated string userToken = 4;
 }
 
 // webSocket failed user token
